@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static "bootstrap.min.css" %}" /> <link rel="stylesheet" href="{% static "style.css" %}">
   </head>
   <body>
-    {% include "navbar.html" %} {% block content %}{% endblock content %}
+    {% include "navbar.html" %} {% block content %}{% endblock content %} {% block script %}{% endblock script %}
   </body>
   <script src="{% static 'bootstrap.min.js' %}"></script>
 </html>
