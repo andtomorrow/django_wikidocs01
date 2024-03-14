@@ -1,6 +1,19 @@
 {% extends "base.html" %} {% load pybo_filter %} {% block content %}
 
 <div class="container my-3">
+  <div class="row my-3">
+    <div class="col-6">
+      <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록하기</a>
+    </div>
+    <div class="col-6">
+      <div class="input-group">
+        <input type="text" class="form-control" id="search_kw" value="{{ kw|default_if_none:'' }}" />
+        <div class="input-group-append">
+          <button type="button" class="btn btn-outline-secondary" id="btn_search">찾기</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <table class="table">
     <thead>
       <tr class="text-center table-dark">
@@ -38,29 +51,51 @@
     <!-- 이전 페이지 -->
     {% if question_list.has_previous %}
     <li class="page-item">
-      <a href="?={{ question_list.previous_page_number }}" class="page-link">이전</a>
+      {% comment %} <a href="?={{ question_list.previous_page_number }}" class="page-link">이전</a> {% endcomment %}
+      <a class="page-link" data-page="{{ question_list.previous_page_number }}" href="javascript:void(0)">이전</a>
     </li>
     {% endif %}
     <!-- 페이지 리스트 -->
     {% for page_number in question_list.paginator.page_range %} {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5 %} {% if page_number == question_list.number %}
     <li class="page-item active" aria-current="page">
-      <a href="?page={{ page_number }}" class="page-link">{{ page_number }}</a>
+      {% comment %} <a href="?page={{ page_number }}" class="page-link">{{ page_number }}</a> {% endcomment %}
+      <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
     </li>
     {% else %}
     <li class="page-item">
-      <a href="?page={{ page_number }}" class="page-link">{{ page_number }}</a>
+      {% comment %} <a href="?page={{ page_number }}" class="page-link">{{ page_number }}</a> {% endcomment %}
+      <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
     </li>
     {% endif %} {% endif %} {% endfor %}
     <!-- 다음 페이지 -->
     {% if question_list.has_next %}
     <li class="page-item">
-      <a href="?page={{ question_list.next_page_number }}" class="page-link">다음</a>
+      {% comment %} <a href="?page={{ question_list.next_page_number }}" class="page-link">다음</a> {% endcomment %}
+      <a class="page-link" data-page="{{ page_list.next_page_number }}" href="javascript:void(0)">다음</a>
     </li>
     {% endif %}
   </ul>
   <!-- 페이징 처리 끝 -->
-
-  <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록하기</a>
 </div>
+<form id="searchForm" action="{% url 'index' %}" method="get">
+  <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}" />
+  <input type="hidden" id="page" name="page" value="{{ page }}" />
+</form>
 
-{% endblock content %}
+{% endblock content %} {% block script %}
+<script type="text/javascript">
+  const page_elements = document.getElementsByClassName("page-link")
+  Array.from(page_elements).forEach(function (element) {
+    element.addEventListener("click", function () {
+      document.getElementById("page").value = this.dataset.page
+      document.getElementById("searchForm").submit()
+    })
+  })
+  const btn_search = document.getElementById("btn_search")
+  btn_search.addEventListener("click", function () {
+    document.getElementById("kw").value = document.getElementById("search_kw").value
+    document.getElementById("page").value = 1
+    document.getElementById("searchForm").submit()
+  })
+</script>
+{% endblock script %}
